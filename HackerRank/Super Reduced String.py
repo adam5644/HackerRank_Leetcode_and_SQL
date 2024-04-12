@@ -12,34 +12,23 @@ import sys
 # The function is expected to return a STRING.
 # The function accepts STRING s as parameter.
 #
+def remove1(s, i):
+    if i >= len(s) - 1:  # Adjust for index range
+        return s
+    if len(s) <= 1:
+        return s
+    if s[i] == s[i+1]:
+        s = s[:i] + s[i+2:]
+        return remove1(s, 0)  # Start from the beginning after a reduction
+    else:
+        return remove1(s, i+1)
 
 def superReducedString(s):
-    # Write your code here
-    if len(s) == 0:
-        return 'Empty String'
-    
-    
-    def find(s):
-        # print('before = ', s)
-        for i in range(0, len(s)-1):
-            # print('i = ', i)
-            if s[i] == s[i+1]:
-                # print('s[i] = ', s[i])
-                # print('s[i+1] = ', s[i+1])
-                s = s[:i] + s[i+2:]
-                # print('after = ', s)
-                s = find(s)
-                return s 
-        # print('final s = ', s)
-        return s
-            
-    s = find(s)
-        
-    if len(s) == 0:
-        return 'Empty String'
-    else: 
-        return s
-        
+    reduced_s = remove1(s, 0)
+    if len(reduced_s) == 0:  # Check if the string is empty after reduction
+        return "Empty String"
+    else:
+        return reduced_s
     
 
 if __name__ == '__main__':
