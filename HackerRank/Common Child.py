@@ -1,18 +1,43 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+#
+# Complete the 'commonChild' function below.
+#
+# The function is expected to return an INTEGER.
+# The function accepts following parameters:
+#  1. STRING s1
+#  2. STRING s2
+#
 def commonChild(s1, s2):
-    # Create a 2D DP array with independent rows
-    dp = [[0] * (len(s1) + 1) for _ in range(len(s2) + 1)]
+    # Initialize the DP table
+    dp = [[0] * (len(s2) + 1) for _ in range(len(s1) + 1)]
 
-    # dp[s2][s1]
-    for i in range(len(s1)):
-        for j in range(len(s2)):
-            if s1[i] == s2[j]:
-                # When the characters match, add 1 to the result from the previous indices
-                dp[i+1][j+1] = dp[i][j] + 1
+    # Fill the DP table
+    for i in range(1, len(s1) + 1):
+        for j in range(1, len(s2) + 1):
+            if s1[i - 1] == s2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
             else:
-                # If they don't match, carry over the max from either the previous row or column
-                dp[i+1][j+1] = max(dp[i][j+1], dp[i+1][j])
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    
+    return dp[len(s1)][len(s2)]
+                    
 
-    # The value in the bottom right corner is the length of the longest common subsequence
-    return dp[-1][-1]
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
 
-# This code is meant to be run on HackerRank, which handles input/output for you.
+    s1 = input()
+
+    s2 = input()
+
+    result = commonChild(s1, s2)
+
+    fptr.write(str(result) + '\n')
+
+    fptr.close()
