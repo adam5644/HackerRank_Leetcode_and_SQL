@@ -1,35 +1,92 @@
-def legoBlocks(h, w):
-    mod = 10**9+7
+#!/bin/python3
 
-    # su[i] is the number of ways to build a wall of width i (solid + unsolid)
-    # s[i] is the number of ways to build a solid wall of width i (no vertical breaks)
+import math
+import os
+import random
+import re
+import sys
+
+#
+# Complete the 'legoBlocks' function below.
+#
+# The function is expected to return an INTEGER.
+# The function accepts following parameters:
+#  1. INTEGER n
+#  2. INTEGER m
+#
+
+# def legoBlocks(n, m):
+#     # Write your code here
+#     width_ways = [0] * (m+1)
+#     if m >= 1: width_ways[1] = 1
+#     if m >= 2:  width_ways[2] = 2
+#     if m >= 3: width_ways[3] = 4
+#     if m >= 4:  width_ways[4] = 8
+#     for i in range(5, m+1):
+#         width_ways[i] = width_ways[i-1] + width_ways[i-2] + width_ways[i-3] + width_ways[i-4]
+        
+#     all_walls = (width_ways[-1]**n)%1000000007
     
-    ww = [0] * (w+1)
-    s = [0] * (w+1)
+#     # calc all_walls of diff width
+#     all_walls_diff_width = [0] * (m+1)
+#     for i in range(1, m):
+#         all_walls_diff_width[i] = (width_ways[i]**n)%1000000007
     
-    ww[0] = 1  # Base case: there's one way to build a wall of width 0
-    ww[1] = 1  # One block of width 1
-    if w >= 2: ww[2] = 2  # Two blocks of width 1, or one block of width 2
-    if w >= 3: ww[3] = 4  # Four combinations: 111, 12, 21, 3
-    if w >= 4: ww[4] = 8  # Eight combinations: 1111, 112, 121, 13, 211, 22, 31, 4
+#     # minus bad walls 
+#     for i in range(1,m):
+#         left_bad_walls = all_walls_diff_width[i]
+#         right_bad_walls = all_walls_diff_width[m-i]
+#         bad_walls = left_bad_walls * right_bad_walls
+#         all_walls -= (bad_walls)%1000000007
+    
+    
+    # return all_walls
 
-    for i in range(5, w+1):
-        ww[i] = (ww[i-1] + ww[i-2] + ww[i-3] + ww[i-4]) % mod
+def legoBlocks(h,w):
+    row = [0] * (w+1)
+    if w>=1: row[1] = 1
+    if w>=2: row[2] = 2
+    if w>=3: row[3] = 4
+    if w>=4: row[4] = 8
+    if w>=5:
+        for i in range(5, w+1):
+            row[i] = (row[i-1] + row[i-2] + row[i-3] + row[i-4]) %1000000007
+            
+            
+            
+    total = row.copy()
+    for _ in range(2, h+1):
+        for i in range(w+1):
+            total[i] = (row[i] * total[i])%1000000007
+            
+    print('total = ', total)
+            
+    solid = [0] * (w+1)
+    solid[1] = 1
+    for ww in range(2, w+1):
+        unsolid_sum = 0
+        for i in range(1,ww):
+            unsolid_sum += ((solid[i] * total[ww-i])%1000000007)
+        solid[ww] = (total[ww] - unsolid_sum)%1000000007
+        
+    print('solid = ', solid)
+        
+    return solid[w]%1000000007
+    
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
 
-    # Solid wall of width 1 and no vertical breaks
-    s[0] = 1  # Base case: there's one way to build a solid wall of width 0
-    s[1] = 1  # One block of width 1
+    t = int(input().strip())
 
-    for i in range(2, w+1):
-        total = pow(ww[i], h, mod)  # Total number of ways to build the wall of height h and width i
+    for t_itr in range(t):
+        first_multiple_input = input().rstrip().split()
 
-        # Calculate the number of bad (unsolid) configurations
-        bad = 0
-        for j in range(1, i):
-            bad += (s[j] * pow(ww[i-j], h, mod)) % mod
-            bad %= mod
+        n = int(first_multiple_input[0])
 
-        # Subtract the bad configurations from total to get the solid configurations
-        s[i] = (total - bad + mod) % mod  # Add mod before taking modulo to handle negative numbers
+        m = int(first_multiple_input[1])
 
-    return s[-1]  # Return the number of ways to build a solid wall of width w
+        result = legoBlocks(n, m)
+
+        fptr.write(str(result) + '\n')
+
+    fptr.close()
