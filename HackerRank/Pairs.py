@@ -1,24 +1,41 @@
-def pairs(k, arr):
-    c = 0
-    arr.sort()  # Sort the list in place
-    i = 0
-    j = 1
-    n = len(arr)
+#!/bin/python3
 
-    while j < n:
-        diff = arr[j] - arr[i]
-        
-        # If the difference is too small, increase j to get a bigger difference
-        if diff < k:
-            j += 1
-        # If the difference is too big, increase i to get a smaller difference
-        elif diff > k:
-            i += 1
-        else:  # The difference is equal to k
-            c += 1
-            j += 1  # Move j to look for the next pair
-            
-            # Ensure i and j do not cross over
-            if j <= i:
-                j = i + 1
-    return c#
+import math
+import os
+import random
+import re
+import sys
+
+#
+# Complete the 'pairs' function below.
+#
+# The function is expected to return an INTEGER.
+# The function accepts following parameters:
+#  1. INTEGER k
+#  2. INTEGER_ARRAY arr
+#
+
+def pairs(k, arr):
+    a = set(arr)
+    b = set([item + k for item in set(arr)])
+    print('a = ', a)
+    print('b = ', b)
+    return len(a.intersection(b))
+    
+
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    first_multiple_input = input().rstrip().split()
+
+    n = int(first_multiple_input[0])
+
+    k = int(first_multiple_input[1])
+
+    arr = list(map(int, input().rstrip().split()))
+
+    result = pairs(k, arr)
+
+    fptr.write(str(result) + '\n')
+
+    fptr.close()
