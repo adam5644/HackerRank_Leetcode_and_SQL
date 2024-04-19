@@ -1,0 +1,32 @@
+def preprocessDate(dates):
+    d,m,y = dates.split()
+    d= d.replace('th','')
+    d=d.replace('st','')
+    d=d.replace('nd','')
+    d=d.replace('rd','')
+    
+    m=m.replace('Jan','01')
+    m=m.replace('Feb','02')
+    m=m.replace('Mar','03')
+    m=m.replace('Apr','04')
+    m=m.replace('May','05')
+    m=m.replace('Jun','06')
+    m=m.replace('Jul','07')
+    m=m.replace('Aug','08')
+    m=m.replace('Sep','09')
+    m=m.replace('Oct','10')
+    m=m.replace('Nov','11')
+    m=m.replace('Dec','12')
+    
+    return y+'-'+m+'-'+d
+    
+print(preprocessDate("20th Oct 2052"))
+print(preprocessDate("6th Jun 1933"))
+print(preprocessDate("26th May 1960"))
+print(preprocessDate("20th Sep 1958"))
+print(preprocessDate("16th Mar 2068"))
+print(preprocessDate("25th May 1912"))
+print(preprocessDate("16th Dec 2018"))
+print(preprocessDate("26th Dec 2061"))
+print(preprocessDate("4th Nov 2030"))
+print(preprocessDate("28th Jul 1963"))
