@@ -1,141 +1,50 @@
-#!/bin/python3
+import heapq
+from collections import defaultdict
 
-import math
-import os
-import random
-import re
-import sys
-
-#
-# Complete the 'getCost' function below.
-#
-# The function accepts WEIGHTED_INTEGER_GRAPH g as parameter.
-#
-
-#
-# For the weighted graph, <name>:
-#
-# 1. The number of nodes is <name>_nodes.
-# 2. The number of edges is <name>_edges.
-# 3. An edge exists between <name>_from[i] and <name>_to[i]. The weight of the edge is <name>_weight[i].
-#
-#
-
-#def getCost(g_nodes, g_from, g_to, g_weight):
-    # Print your answer within the function and return nothing
-#     print(g_nodes)
-#     print(g_from)
-#     print(g_to)
-#     print(g_weight)  
-# 5
-# [1, 3, 1, 4, 2]
-# [2, 5, 4, 5, 3]
-# [60, 70, 120, 150, 80]
-
-    # find a line between first to last that has smallest max number
-    
 def getCost(g_nodes, g_from, g_to, g_weight):
-    # dp[x] = min(each dp[y to x] + each weight)
-    info = [[] for _ in range(g_nodes + 1)]
-    
-    for i in range(len(g_from)):
-        info[g_from[i]].append([g_to[i], g_weight[i]])
-        info[g_to[i]].append([g_from[i], g_weight[i]])
-    
-    dp = [math.inf]* (g_nodes+1) # dp[x] is min fare to go from pos 0 to pos x
-    dp[1]=0
-    
-    
-    curr = set([1])
-    while curr:
-        nxt = set([])
-        
-        for i in curr:
-            for (j,w) in info[i]:
-            
-                alt = max(dp[i], w)
-                
-                if alt < dp[j]:
-                    dp[j] = alt
-                    nxt.add(j)
-            
-        curr = nxt
-        
-    #rint(dp)
-    print(dp[g_nodes] if dp[g_nodes] != math.inf else "NO PATH EXISTS")
-    
+    # Graph initialization
+    edges = defaultdict(list)
+    for u, v, w in zip(g_from, g_to, g_weight):
+        edges[u].append((v, w))
+        edges[v].append((u, w))  # since the graph is undirected
 
+    # Priority queue for Dijkstra-like approach
+    pq = []
+    heapq.heappush(pq, (0, 1))  # (cost, node), starting from node 1
+    min_cost = {1: 0}  # Minimum cost to reach each node
 
+    while pq:
+        current_cost, u = heapq.heappop(pq)
+        if u == g_nodes:
+            return current_cost  # Return cost immediately if we reach the last node
 
-# def getCost(g_nodes, g_from, g_to, g_weight):
-#     # Correctly initialize the adjacency list for each node
-#     info = [[] for _ in range(g_nodes + 1)]
-    
-#     # Fill in the adjacency list with connections and weights
-#     for i in range(len(g_from)):
-#         info[g_from[i]].append([g_to[i], g_weight[i]])
-#         info[g_to[i]].append([g_from[i], g_weight[i]])
-    
-#     # Initialize dp where dp[i] is the minimum fare to reach station i from station 1
-#     dp = [math.inf] * (g_nodes + 1)
-#     dp[1] = 0  # Starting point, cost is 0
-    
-#     # Use a set to keep track of the current station(s) being processed
-#     curr = set([1])
-#     while curr:
-#         nxt = set()
-        
-#         for i in curr:
-#             for j, w in info[i]:
-#                 # Determine if the current path offers a lower maximum fare to station j
-#                 alt = max(dp[i], w)
-                
-#                 if alt < dp[j]:
-#                     dp[j] = alt
-#                     nxt.add(j)
-            
-#         curr = nxt
-    
-#     # Print the minimum fare to reach the last station or "NO PATH EXISTS" if not reachable
-#     print(dp[g_nodes] if dp[g_nodes] != math.inf else "NO PATH EXISTS")
+        for v, weight in edges[u]:
+            # Cost to move to the next node
+            # next_cost = max(0, weight - current_cost)
+            # total_cost = current_cost + next_cost
+            total_cost = max(weight, current_cost)
 
+            # Only push to heap if the next node can be reached with a cheaper cost
+            if v not in min_cost or total_cost < min_cost[v]:
+                min_cost[v] = total_cost
+                heapq.heappush(pq, (total_cost, v))
 
-    
-    # # Create an adjacency list where each node points to its neighbors and the corresponding weights
-    # edges = [[] for _ in range(g_nodes + 1)]
-    # for i in range(len(g_from)):
-    #     edges[g_from[i]].append((g_to[i], g_weight[i]))
-    #     edges[g_to[i]].append((g_from[i], g_weight[i]))
-    
-    # # Set the fare to reach the first station as 0 and infinity for others as they are initially unreachable
-    # dp = [math.inf] * (g_nodes + 1) # dp[x] is the min far to reach position x from 0
-    # dp[1] = 0
+    # If node g_nodes is never reached
+    if g_nodes not in min_cost:
+        return "NO PATH EXISTS"
+    else:
+        return min_cost[g_nodes]
 
-    # # Use a set to keep track of the current station(s) being considered for exploration
-    # current = set([1])
-    # while current:
-    #     next_set = set()
-    #     for f in current: # o(n)
-    #         for (t, w) in edges[f]: #o(n^2)
-    #             # Calculate the fare required to reach station 't' from station 'f' considering the fare rules
-    #             alt = max(dp[f], w)
-    #             if alt < dp[t]:
-    #                 dp[t] = alt
-    #                 next_set.add(t)
-    #     current = next_set
-    
-    # # Print the minimum fare to reach the last station or 'NO PATH EXISTS' if it's unreachable
-    # print(dp[g_nodes] if dp[g_nodes] != math.inf else 'NO PATH EXISTS')
+# Input processing
+g_nodes, g_edges = map(int, input().split())
+g_from, g_to, g_weight = [], [], []
 
+for _ in range(g_edges):
+    u, v, w = map(int, input().split())
+    g_from.append(u)
+    g_to.append(v)
+    g_weight.append(w)
 
-if __name__ == '__main__':
-    g_nodes, g_edges = map(int, input().rstrip().split())
-
-    g_from = [0] * g_edges
-    g_to = [0] * g_edges
-    g_weight = [0] * g_edges
-
-    for i in range(g_edges):
-        g_from[i], g_to[i], g_weight[i] = map(int, input().rstrip().split())
-
-    getCost(g_nodes, g_from, g_to, g_weight)
+# Function call
+result = getCost(g_nodes, g_from, g_to, g_weight)
+print(result)
